@@ -3,6 +3,4 @@
 printf "Docker internal IP:\n\t"
 docker inspect -f "{{ .NetworkSettings.IPAddress }}" $1
 printf "Port mappings:\n\t"
-#docker inspect -f "{{ .NetworkSettings.Ports }}" $1
-#docker inspect -f "{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}" $1
 docker inspect -f '{{range $p, $conf := .NetworkSettings.Ports}} {{if $conf}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}} {{end}}' $1 | sed -E 's,^[ ]*,,'
