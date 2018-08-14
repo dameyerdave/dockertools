@@ -1,6 +1,13 @@
 #!/bin/bash
 
-printf "Docker internal IP:\n\t"
-docker inspect -f "{{ .NetworkSettings.IPAddress }}" $1
+printf "Docker internal IPs:\n"
+IP=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}" $1 | sed -E 's,^[ ]*,,')
+if [ "$IP" != "" ]; then
+  printf "\t%s\n" "${IP}"
+fi
+IP=$(docker inspect -f '{{range $p, $nw := .NetworkSettings.Networks}} {{$p}} -> {{$nw.IPAddress}} {{end}}' $1 | sed -E 's,^[ ]*,,')
+if [ "$IP" != "" ]; then
+  printf "\t%s\n" "${IP}"
+fi
 printf "Port mappings:\n\t"
 docker inspect -f '{{range $p, $conf := .NetworkSettings.Ports}} {{if $conf}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}} {{end}}' $1 | sed -E 's,^[ ]*,,'
