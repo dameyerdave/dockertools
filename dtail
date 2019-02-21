@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function usage {
+    echo "USAGE: $(basename $0) container-name"
+}
+
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+CONT="$1"
+
+docker logs -f "${CONT}"
