@@ -4,4 +4,7 @@ USR=0
 if [ "$2" != "" ]; then
     USR="$2"
 fi
-docker exec -u ${USR} -it $1 /bin/bash
+
+DC=$(docker ps -a --format "{{.Names}}" | grep "$1" | head -1)
+
+docker exec -u ${USR} -it $DC /bin/bash
