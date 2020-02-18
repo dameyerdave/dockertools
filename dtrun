@@ -14,5 +14,5 @@ fi
 FAV="$1"
 
 if [ "$FAV" = "mongo" ]; then
-	docker run --name mongoi -hostname mongo -p 27017:27017 mongo
+	docker run -it -d --name mongo --hostname mongo -p 27017:27017 mongo
 fi
