@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function usage {
+    echo "USAGE: $(basename $0) favorite"
+	echo ""
+	echo "Favorites are:"
+	echo "  - mongo"
+}
+
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+FAV="$1"
+
+if [ "$FAV" = "mongo" ]; then
+	docker run --name mongoi -hostname mongo -p 27017:27017 mongo
+fi
