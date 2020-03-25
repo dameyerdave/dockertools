@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -f docker-compose.yml ];
+	docker-compose up -d
+else
+	echo "No docker-compose.yml in current directory!"
+	exit 1
+fi
