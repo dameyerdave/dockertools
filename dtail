@@ -8,6 +8,6 @@ if [ $# -lt 1 ]; then
     usage
 fi
 
-CONT="$1"
+DC=$(docker ps -a --format "{{.Names}}" | grep "$1" | head -1)
 
-docker logs -f "${CONT}"
+docker logs -f "${DC}"

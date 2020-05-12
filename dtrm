@@ -10,4 +10,7 @@ fi
 
 CONT="$1"
 
-docker rm -f "${CONT}"
+while read container
+do
+    docker rm -f $container
+done < <(docker ps -a --format "{{.Names}}" | grep "$PAT")
