@@ -8,7 +8,7 @@ if [ $# -lt 1 ]; then
     usage
 fi
 
-CONT="$1"
+PAT="$1"
 
 while read container
 do
