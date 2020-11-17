@@ -1,10 +1,12 @@
 #!/bin/bash
 
 function usage {
-    echo "USAGE: $(basename $0) favorite"
+  echo "USAGE: $(basename $0) favorite [params]"
 	echo ""
 	echo "Favorites are:"
+  echo "  - ."
 	echo "  - mongo"
+  echo "  - splunk"
 }
 
 if [ $# -lt 1 ]; then
@@ -13,7 +15,29 @@ fi
 
 FAV="$1"
 
-if [ "$FAV" = "mongo" ]; then
+if [ "$FAV" = '.' ]; then
+  DIR=$(pwd -P)
+  TMP=${DIR##*/}
+  . .env
+  docker build -t ${TMP} .
+  shift
+  ENV=''
+  if [ -f .env ]; then
+    echo "Setting environment variables from .env"
+    while read line
+    do
+      if [[ ! -z "$line" ]] && [[ $line != export* ]]; then
+        # if [ ! -z "$ENV" ]; then
+        ENV+=' -e '
+        # fi
+        # ENV+='"'
+        ENV+=$(echo "${line}" | cut -d= -f1)
+        # ENV+='"'
+      fi
+    done < <(cat .env)
+  fi
+  exec docker run ${ENV} -ti --rm --name "${TMP}" $* ${TMP}
+elif [ "$FAV" = "mongo" ]; then
 	docker run -it -d --name mongo --hostname mongo -p 27017:27017 --restart unless-stopped mongo:latest
 elif [ "$FAV" = "splunk" ]; then
 	docker run --name splunk --hostname splunk -p 8000:8000 -p 8089:8089 -p 9997:9997 --restart unless-stopped -d -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=splunk01" splunk/splunk:latest
