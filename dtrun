@@ -16,27 +16,44 @@ fi
 FAV="$1"
 
 if [ "$FAV" = '.' ]; then
-  DIR=$(pwd -P)
-  TMP=${DIR##*/}
-  . .env
-  docker build -t ${TMP} .
-  shift
-  ENV=''
-  if [ -f .env ]; then
-    echo "Setting environment variables from .env"
+  if [ -f Dockerfile ]; then
     while read line
     do
-      if [[ ! -z "$line" ]] && [[ $line != export* ]]; then
-        # if [ ! -z "$ENV" ]; then
-        ENV+=' -e '
-        # fi
-        # ENV+='"'
-        ENV+=$(echo "${line}" | cut -d= -f1)
-        # ENV+='"'
+      if [[ ! -z "$line" ]] && [[ $line != \#* ]]; then
+        if [[ $line == EXPOSE* ]]; then
+          PORTS+=' -p '
+          PORT=$(echo "${line}" | cut -d' ' -f2)
+          if [[ $PORT == *"/"* ]]; then
+            PORT=${PORT%%/*}
+          fi
+          PORTS+="${PORT}:${PORT}"
+        fi
       fi
-    done < <(cat .env)
+    done < <(cat Dockerfile)
+    DIR=$(pwd -P)
+    TMP=${DIR##*/}
+    . .env
+    docker build -t ${TMP} .
+    shift
+    ENV=''
+    if [ -f .env ]; then
+      echo "Setting environment variables from .env"
+      while read line
+      do
+        if [[ ! -z "$line" ]] && [[ $line != export* ]]; then
+          # if [ ! -z "$ENV" ]; then
+          ENV+=' -e '
+          # fi
+          # ENV+='"'
+          ENV+=$(echo "${line}" | cut -d= -f1)
+          # ENV+='"'
+        fi
+      done < <(cat .env)
+    fi
+    exec docker run ${ENV} ${PORTS} -ti --rm --name "${TMP}" $* ${TMP}
+  else
+    echo "No Dockerfile found in current directory."
   fi
-  exec docker run ${ENV} -ti --rm --name "${TMP}" $* ${TMP}
 elif [ "$FAV" = "mongo" ]; then
 	docker run -it -d --name mongo --hostname mongo -p 27017:27017 --restart unless-stopped mongo:latest
 elif [ "$FAV" = "splunk" ]; then
