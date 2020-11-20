@@ -1,8 +1,12 @@
 #!/bin/bash
 
 if [ -f docker-compose.yml ]; then
-    docker-compose pull
-	docker-compose up --build --force-recreate -d
+  docker-compose pull $1
+  OVERRIDE=''
+  if [ -f docker-compose.override.yml ]; then
+    OVERRIDE='-f docker-compose.override.yml'
+  fi
+	docker-compose -f docker-compose.yml ${OVERRIDE} up --build --force-recreate -d $1
 else
 	echo "No docker-compose.yml in current directory!"
 	exit 1
