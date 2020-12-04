@@ -32,7 +32,6 @@ if [ "$FAV" = '.' ]; then
     done < <(cat Dockerfile)
     DIR=$(pwd -P)
     TMP=${DIR##*/}
-    . .env
     docker build -t ${TMP} .
     shift
     ENV=''
@@ -46,10 +45,13 @@ if [ "$FAV" = '.' ]; then
           # fi
           # ENV+='"'
           ENV+=$(echo "${line}" | cut -d= -f1)
+          eval "export ${line}"
           # ENV+='"'
         fi
       done < <(cat .env)
     fi
+    env
+    echo "docker run ${ENV} ${PORTS} -ti --rm --name '${TMP}' $* ${TMP}"
     exec docker run ${ENV} ${PORTS} -ti --rm --name "${TMP}" $* ${TMP}
   else
     echo "No Dockerfile found in current directory."
