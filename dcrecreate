@@ -6,7 +6,11 @@ if [ -f docker-compose.yml ]; then
   if [ -f docker-compose.override.yml ]; then
     OVERRIDE='-f docker-compose.override.yml'
   fi
-	docker-compose -f docker-compose.yml ${OVERRIDE} up --build --force-recreate -d $1
+  APPEND=''
+  if [ "$1" != "" ]: then
+    APPEND="--no-deps ${1}"
+  fi
+  docker-compose -f docker-compose.yml ${OVERRIDE} up --build --force-recreate -d ${APPEND}
 else
 	echo "No docker-compose.yml in current directory!"
 	exit 1

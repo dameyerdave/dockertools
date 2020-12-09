@@ -5,7 +5,7 @@ if [ -f docker-compose.yml ]; then
   if [ -f docker-compose.override.yml ]; then
     OVERRIDE='-f docker-compose.override.yml'
   fi
-	docker-compose -f docker-compose.yml ${OVERRIDE} up -d $*
+	docker-compose -f docker-compose.yml ${OVERRIDE} up -d "$@"
 else
 	echo "No docker-compose.yml in current directory!"
 	exit 1
