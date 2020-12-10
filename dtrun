@@ -5,8 +5,9 @@ function usage {
 	echo ""
 	echo "Favorites are:"
   echo "  - ."
-	echo "  - mongo"
-  echo "  - splunk"
+	echo "  - mongo - a mongo database"
+  echo "  - splunk a splunk instance"
+  echo "  - sshd - an ssh daemon"
 }
 
 if [ $# -lt 1 ]; then
@@ -60,4 +61,28 @@ elif [ "$FAV" = "mongo" ]; then
 	docker run -it -d --name mongo --hostname mongo -p 27017:27017 --restart unless-stopped mongo:latest
 elif [ "$FAV" = "splunk" ]; then
 	docker run --name splunk --hostname splunk -p 8000:8000 -p 8089:8089 -p 9997:9997 --restart unless-stopped -d -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=splunk01" splunk/splunk:latest
+elif [ "$FAV" = "sshd" ]; then
+  if [ ! -f ~/.ssh/tunnel ]; then
+    ssh-keygen -t ed25519 -b 4096 -C tunnel -f ~/.ssh/tunnel -N ''
+  fi
+  KEY=$(cat ${HOME}/.ssh/tunnel.pub)
+  VOL="${HOME}/.docker/sshd/config"
+  if [ ! -d ${VOL} ]; then
+    mkdir -p ${VOL}
+  fi
+  docker run -d \
+  --name=sshd \
+  --hostname=sshd \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Europe/Zurich \
+  -e SUDO_ACCESS=false \
+  -e PASSWORD_ACCESS=false \
+  -e PUBLIC_KEY="${KEY}" \
+  -e USER_NAME=tunnel \
+  -p 2222:2222 \
+  -v ${VOL}:/config \
+  --restart unless-stopped \
+  ghcr.io/linuxserver/openssh-server
+  docker exec -it sshd /bin/sed -i 's/^AllowTcpForwarding no/AllowTcpForwarding yes/' /etc/ssh/sshd_config
 fi
