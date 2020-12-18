@@ -5,7 +5,7 @@ function usage {
 	echo ""
 	echo "Favorites are:"
   echo "  - ."
-	echo "  - mongo - a mongo database"
+	echo "  - mongo [name] [port] - a mongo database"
   echo "  - splunk a splunk instance"
   echo "  - sshd - an ssh daemon"
 }
@@ -58,7 +58,15 @@ if [ "$FAV" = '.' ]; then
     echo "No Dockerfile found in current directory."
   fi
 elif [ "$FAV" = "mongo" ]; then
-	docker run -it -d --name mongo --hostname mongo -p 27017:27017 --restart unless-stopped mongo:latest
+  NAME='mongo'
+  if [ "$2" != "" ]; then
+    NAME="$2"
+  fi
+  PORT=27017
+  if [ "$3" != "" ]; then
+    PORT="$3"
+  fi
+	docker run -it -d --name ${NAME} --hostname ${NAME} -p ${PORT}:27017 --restart unless-stopped mongo:latest
 elif [ "$FAV" = "splunk" ]; then
 	docker run --name splunk --hostname splunk -p 8000:8000 -p 8089:8089 -p 9997:9997 --restart unless-stopped -d -e "SPLUNK_START_ARGS=--accept-license" -e "SPLUNK_PASSWORD=splunk01" splunk/splunk:latest
 elif [ "$FAV" = "sshd" ]; then
