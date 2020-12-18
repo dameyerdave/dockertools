@@ -7,7 +7,7 @@ if [ -f docker-compose.yml ]; then
     OVERRIDE='-f docker-compose.override.yml'
   fi
   APPEND=''
-  if [ "$1" != "" ]: then
+  if [ "$1" != "" ]; then
     APPEND="--no-deps ${1}"
   fi
   docker-compose -f docker-compose.yml ${OVERRIDE} up --build --force-recreate -d ${APPEND}
