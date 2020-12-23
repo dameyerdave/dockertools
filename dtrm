@@ -13,4 +13,5 @@ PAT="$1"
 while read container
 do
     docker rm -f $container
+    docker image rm -f $container
 done < <(docker ps -a --format "{{.Names}}" | grep "$PAT")
