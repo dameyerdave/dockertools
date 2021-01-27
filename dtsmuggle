@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function usage {
+  echo "USAGE: $(basename $0) image ssh_spec"
+  exit 1
+}
+
+if [ $# -lt 1 ]; then
+  usage
+fi
+
+IMG="$1"
+SSH="$2"
+
+docker pull ${IMG}
+docker save ${IMG} | gzip | ssh ${SSH} "cat | docker load" 
+

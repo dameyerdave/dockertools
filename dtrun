@@ -8,6 +8,8 @@ function usage {
 	echo "  - mongo [name] [port] - a mongo database"
   echo "  - splunk a splunk instance"
   echo "  - sshd - an ssh daemon"
+  echo "  - proxy - a tiny web proxy"
+  echo "  - registry - a docker registry proxy"
 }
 
 if [ $# -lt 1 ]; then
@@ -93,4 +95,25 @@ elif [ "$FAV" = "sshd" ]; then
   --restart unless-stopped \
   ghcr.io/linuxserver/openssh-server
   docker exec -it sshd /bin/sed -i 's/^AllowTcpForwarding no/AllowTcpForwarding yes/' /etc/ssh/sshd_config
+  docker exec -it sshd /bin/sed -i 's/^#UseDNS no/UseDNS no/' /etc/ssh/sshd_config
+elif [ "$FAV" = "proxy" ]; then
+  docker run -d \
+  --name proxy \
+  --hostname proxy \
+  -p 8888:8888 \
+  --restart unless-stopped \
+  vimagick/tinyproxy
+elif [ "$FAV" = "registry" ]; then
+  docker run -d \
+  --name registry \
+  --hostname registry \
+  -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io \
+  -e REGISTRY_HTTP_ADDR=127.0.0.1:15000 \
+  --net host \
+  --restart unless-stopped \
+  registry:2
+  # -e HTTP_PROXY=http://localhost:3128 \
+  # -e HTTPS_PROXY=http://localhost:3128 \
+  # -e REGISTRY_PROXY_USERNAME=dameyerdave \
+  # -e REGISTRY_PROXY_PASSWORD=99409298-ca91-4067-bbe8-3893998ea082 \
 fi
