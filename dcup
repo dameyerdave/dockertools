@@ -1,9 +1,25 @@
 #!/bin/bash
 
-if [ -f docker-compose.yml ]; then
-  OVERRIDE=''
-  if [ -f docker-compose.override.yml ]; then
-    OVERRIDE='-f docker-compose.override.yml'
+IGNORE_OVERRIDE=0
+OVERRIDE=''
+
+if [ "$1" == "-i" ]; then
+  IGNORE_OVERRIDE=1
+  shift
+fi
+
+if [ "$1" == "-o" ]; then
+  IGNORE_OVERRIDE=1
+  shift
+  OVERRIDE="-f ${1}"
+  shift
+fi
+
+if [ -f docker-compose.yml ]; then  
+  if [ $IGNORE_OVERRIDE == 0 ]; then
+    if [ -f docker-compose.override.yml ]; then
+      OVERRIDE='-f docker-compose.override.yml'
+    fi
   fi
 	docker-compose -f docker-compose.yml ${OVERRIDE} up "$@"
 else
