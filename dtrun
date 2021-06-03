@@ -116,4 +116,9 @@ elif [ "$FAV" = "registry" ]; then
   # -e HTTPS_PROXY=http://localhost:3128 \
   # -e REGISTRY_PROXY_USERNAME=dameyerdave \
   # -e REGISTRY_PROXY_PASSWORD=99409298-ca91-4067-bbe8-3893998ea082 \
+elif [ "$FAV" = "vep" ]; then
+  mkdir -p ~/vep_data
+  # docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep perl INSTALL.pl -a cfp -s homo_sapiens -y GRCh38 -g all
+  shift
+  docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep "$@"
 fi
