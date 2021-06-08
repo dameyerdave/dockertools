@@ -15,16 +15,13 @@ if [ "$1" == "-o" ]; then
   shift
 fi
 
-COMMAND="$1"
-shift
-
 if [ -f docker-compose.yml ]; then  
   if [ $IGNORE_OVERRIDE == 0 ]; then
     if [ -f docker-compose.override.yml ]; then
       OVERRIDE='-f docker-compose.override.yml'
     fi
   fi
-	docker-compose -f docker-compose.yml ${OVERRIDE} ${COMMAND} "$@"
+	docker compose -f docker-compose.yml ${OVERRIDE} "$@"
 else
 	echo "No docker-compose.yml in current directory!"
 	exit 1
