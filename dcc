@@ -17,10 +17,10 @@ fi
 
 if git rev-parse --is-inside-work-tree 2>&1 > /dev/null; then
   echo "Generate git related environment variables:"
-  GIT_VERSION=$(git describe --always)
-  GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  GIT_LASTCOMMITDATE=$(git log -1 --format=%cI)
-  GIT_COMMITHASH=$(git rev-parse HEAD)
+  export GIT_VERSION=$(git describe --always)
+  export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  export GIT_LASTCOMMITDATE=$(git log -1 --format=%cI)
+  export GIT_COMMITHASH=$(git rev-parse HEAD)
   printf "%-20s: %s\n" "GIT_VERSION" "${GIT_VERSION}"
   printf "%-20s: %s\n" "GIT_BRANCH" "${GIT_BRANCH}"
   printf "%-20s: %s\n" "GIT_LASTCOMMITDATE" "${GIT_LASTCOMMITDATE}"
