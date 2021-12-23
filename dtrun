@@ -116,9 +116,13 @@ elif [ "$FAV" = "registry" ]; then
   # -e HTTPS_PROXY=http://localhost:3128 \
   # -e REGISTRY_PROXY_USERNAME=dameyerdave \
   # -e REGISTRY_PROXY_PASSWORD=99409298-ca91-4067-bbe8-3893998ea082 \
-elif [ "$FAV" = "vep" ]; then
+elif [ "$FAV" = "initvep" ]; then
   mkdir -p ~/vep_data
   # docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep perl INSTALL.pl -a cfp -s homo_sapiens -y GRCh38 -g all
+  docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep sh -c "perl INSTALL.pl --AUTO cfp --NO_UPDATE --CACHE_VERSION 104 --PLUGINS all --SPECIES homo_sapiens_merged --ASSEMBLY GRCh37"
+elif [ "$FAV" = "vep" ]; then
+  mkdir -p ~/vep_data
   shift
-  docker run -t -i -v $HOME/vep_data:/opt/vep/.vep ensemblorg/ensembl-vep "$@"
+  docker run -t -i -v $HOME/vep_data:/opt/vep/.vep -v $(pwd):/tmp/data ensemblorg/ensembl-vep ./vep $@
+  # EXAMPLE: dtrun vep --verbose --format vcf --offline --merged --cache --species homo_sapiens --use_given_ref --canonical --force_overwrite --hgvs --hgvsg --symbol --af_gnomad --uniprot --max_af --sift b --variant_class -i /tmp/data/test.vcf --json -o -
 fi
