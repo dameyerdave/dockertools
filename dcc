@@ -3,6 +3,13 @@
 IGNORE_OVERRIDE=0
 OVERRIDE=''
 
+source .env
+if [ -z "${DCC_ENV}" ]; then
+  DCC_ENV=''
+else
+  echo "Using environment: ${DCC_ENV}"
+fi
+
 if [ "$1" == "-i" ]; then
   IGNORE_OVERRIDE=1
   shift
@@ -30,7 +37,10 @@ fi
 if [ -f docker-compose.yml ]; then  
   if [ $IGNORE_OVERRIDE == 0 ]; then
     if [ -f docker-compose.override.yml ]; then
-      OVERRIDE='-f docker-compose.override.yml'
+      OVERRIDE+=' -f docker-compose.override.yml'
+    fi
+    if [ -f "docker-compose.${DCC_ENV}.yml" ]; then
+      OVERRIDE+=" -f docker-compose.${DCC_ENV}.yml"
     fi
   fi
 	docker-compose -f docker-compose.yml ${OVERRIDE} "$@"
