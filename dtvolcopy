@@ -1,0 +1,26 @@
+#!/bin/bash
+
+function usage {
+  echo "USAGE: $(basename $0) volume ssh_spec"
+  exit 1
+}
+
+if [ $# -lt 2 ]; then
+  usage
+fi
+
+# replace / with _ in image
+VOL="$1"
+SSH="$2"
+
+# This is needed if the image is not locally available
+# docker pull ${IMG}
+docker run --rm -v ${VOL}:/data -v /tmp:/backup busybox tar cvzf /backup/${VOL}.tar.gz /data
+echo "Content is"
+tar tvzf /tmp/${VOL}.tar.gz
+rsync -avzP /tmp/${VOL}.tar.gz ${SSH}:/tmp/
+ssh ${SSH} -t "bash -ic 'docker run --rm -v ${VOL}:/dest -v /tmp:/backup busybox tar xvf /backup/${VOL}.tar.gz -C /dest'"
+
+rm -f /tmp/${VOL}.tar.gz
+
+
