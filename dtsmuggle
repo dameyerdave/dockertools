@@ -9,9 +9,21 @@ if [ $# -lt 1 ]; then
   usage
 fi
 
+# replace / with _ in image
 IMG="$1"
+IMG_FILE="${1//\//_}"
 SSH="$2"
+TMP=$(mktemp /tmp/dtsmuggle.XXXXXX)
 
-docker pull ${IMG}
-docker save ${IMG} | gzip | ssh ${SSH} "cat | docker load" 
+# This is needed if the image is not locally available
+# docker pull ${IMG}
+docker save ${IMG} -o ${TMP}.tar
+gzip ${TMP}.tar 
+mv ${TMP}.tar.gz /tmp/${IMG_FILE}.tar.gz
+rsync -avzP /tmp/${IMG_FILE}.tar.gz ${SSH}:/tmp/
+ssh ${SSH} "$(which docker) load -i /tmp/${IMG}.tar.gz" 
+
+rm -f ${TMP}*
+rm -f /tmp/${IMG_FILE}*
+
 
