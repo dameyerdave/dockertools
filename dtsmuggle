@@ -21,7 +21,7 @@ docker save ${IMG} -o ${TMP}.tar
 gzip ${TMP}.tar 
 mv ${TMP}.tar.gz /tmp/${IMG_FILE}.tar.gz
 rsync -avzP /tmp/${IMG_FILE}.tar.gz ${SSH}:/tmp/
-ssh ${SSH} -t "bash -ic '$(which docker) load -i /tmp/${IMG}.tar.gz'" 
+ssh ${SSH} -t "bash -ic 'source .profile && docker load -i /tmp/${IMG}.tar.gz'" 
 
 rm -f ${TMP}*
 rm -f /tmp/${IMG_FILE}*
